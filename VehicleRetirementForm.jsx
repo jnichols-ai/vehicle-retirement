@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import './VehicleRetirementForm.css';
 
 const MANAGERS = [
   { name: 'Josh Emerson', office: 'Baltimore, MD' },
