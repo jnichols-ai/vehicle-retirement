@@ -66,6 +66,12 @@ export default async function handler(req, res) {
     if (data.licenseState) columnValues.text_mm4t_license_state = data.licenseState;
     if (data.licensePlate) columnValues.text_mm4t_license_plate = data.licensePlate;
 
+    // Add Pickup Location if available
+    if (data.pickupStreet || data.pickupCity || data.pickupState || data.pickupZip) {
+      const pickupAddress = `${data.pickupStreet || ''}, ${data.pickupCity || ''}, ${data.pickupState || ''} ${data.pickupZip || ''}`.trim();
+      columnValues.text_mm4t_pickup_location = pickupAddress;
+    }
+
     // Handle photo uploads (simplified - in production would upload to Monday)
     // For now, we'll just count them as submitted
     if (photoFiles.length > 0) {

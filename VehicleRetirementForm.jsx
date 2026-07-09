@@ -34,6 +34,10 @@ export default function VehicleRetirementForm() {
     equipmentRemoved: false,
     tagsValid: '', // 'valid' or 'expired'
     condition: '',
+    pickupStreet: '',
+    pickupCity: '',
+    pickupState: '',
+    pickupZip: '',
     notes: '',
     photos: [],
   });
@@ -151,6 +155,10 @@ export default function VehicleRetirementForm() {
     if (!formData.equipmentRemoved) newErrors.equipmentRemoved = 'Must confirm equipment removal';
     if (!formData.tagsValid) newErrors.tagsValid = 'Must select tags status';
     if (!formData.condition) newErrors.condition = 'Vehicle condition is required';
+    if (!formData.pickupStreet) newErrors.pickupStreet = 'Street address is required';
+    if (!formData.pickupCity) newErrors.pickupCity = 'City is required';
+    if (!formData.pickupState) newErrors.pickupState = 'State is required';
+    if (!formData.pickupZip) newErrors.pickupZip = 'Zip code is required';
     if (formData.photos.length !== 6) newErrors.photos = `Exactly 6 photos required (${formData.photos.length} uploaded)`;
 
     setErrors(newErrors);
@@ -181,6 +189,10 @@ export default function VehicleRetirementForm() {
       formDataToSend.append('equipmentRemoved', formData.equipmentRemoved);
       formDataToSend.append('tagsValid', formData.tagsValid);
       formDataToSend.append('condition', formData.condition);
+      formDataToSend.append('pickupStreet', formData.pickupStreet);
+      formDataToSend.append('pickupCity', formData.pickupCity);
+      formDataToSend.append('pickupState', formData.pickupState);
+      formDataToSend.append('pickupZip', formData.pickupZip);
       formDataToSend.append('notes', formData.notes);
 
       formData.photos.forEach((photo, index) => {
@@ -211,6 +223,10 @@ export default function VehicleRetirementForm() {
         equipmentRemoved: false,
         tagsValid: '',
         condition: '',
+        pickupStreet: '',
+        pickupCity: '',
+        pickupState: '',
+        pickupZip: '',
         notes: '',
         photos: [],
       });
@@ -447,7 +463,62 @@ export default function VehicleRetirementForm() {
             </div>
           </section>
 
-          {/* Section 5: Inspection Photos */}
+          {/* Section 5: Vehicle Pickup Location */}
+          <section className="vrp-section">
+            <h2 className="vrp-section-title">Vehicle Pickup Location</h2>
+
+            <div className="vrp-form-group">
+              <label htmlFor="pickupStreet">Street Address *</label>
+              <input
+                id="pickupStreet"
+                type="text"
+                value={formData.pickupStreet}
+                onChange={(e) => setFormData(prev => ({ ...prev, pickupStreet: e.target.value }))}
+                placeholder="Enter street address"
+                className="vrp-input"
+              />
+            </div>
+
+            <div className="vrp-grid-2">
+              <div className="vrp-form-group">
+                <label htmlFor="pickupCity">City *</label>
+                <input
+                  id="pickupCity"
+                  type="text"
+                  value={formData.pickupCity}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pickupCity: e.target.value }))}
+                  placeholder="Enter city"
+                  className="vrp-input"
+                />
+              </div>
+              <div className="vrp-form-group">
+                <label htmlFor="pickupState">State *</label>
+                <input
+                  id="pickupState"
+                  type="text"
+                  value={formData.pickupState}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pickupState: e.target.value }))}
+                  placeholder="Enter state (e.g., MD)"
+                  maxLength="2"
+                  className="vrp-input"
+                />
+              </div>
+            </div>
+
+            <div className="vrp-form-group">
+              <label htmlFor="pickupZip">Zip Code *</label>
+              <input
+                id="pickupZip"
+                type="text"
+                value={formData.pickupZip}
+                onChange={(e) => setFormData(prev => ({ ...prev, pickupZip: e.target.value }))}
+                placeholder="Enter zip code"
+                className="vrp-input"
+              />
+            </div>
+          </section>
+
+          {/* Section 6: Inspection Photos */}
           <section className="vrp-section">
             <h2 className="vrp-section-title">Inspection Photos</h2>
             <p className="vrp-section-hint">
