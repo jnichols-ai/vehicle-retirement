@@ -52,7 +52,6 @@ export default async function handler(req, res) {
     const columnValues = {
       text_mm4t4qgh: data.vin.toUpperCase(), // VIN
       text_mm4tqmew: `${data.make || ''} ${data.model || ''}`.trim(), // Make/Model
-      text_mm4tcyx0: data.licensePlate || '', // License Plate
       text_mm4tvvtc: data.office || '', // Office Location
       boolean_mm4tcx3f: data.gpsRemoved === 'true', // GPS Removed
       boolean_mm4tj15z: data.equipmentRemoved === 'true', // Equipment Removed
@@ -62,6 +61,10 @@ export default async function handler(req, res) {
       multiple_person_mm4tz33p: data.manager, // Manager
       date_mm4tavn0: new Date().toISOString().split('T')[0], // Submission Date
     };
+
+    // Add License State and License Plate if available
+    if (data.licenseState) columnValues.text_mm4t_license_state = data.licenseState;
+    if (data.licensePlate) columnValues.text_mm4t_license_plate = data.licensePlate;
 
     // Handle photo uploads (simplified - in production would upload to Monday)
     // For now, we'll just count them as submitted

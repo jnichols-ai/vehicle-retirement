@@ -82,7 +82,8 @@ export default async function handler(req, res) {
       make: columnValues[3] || columnData.make || '', // Make is typically 4th column
       model: columnValues[4] || columnData.model || '', // Model is typically 5th column
       year: columnValues[1] || columnData.year || '', // Year is typically 2nd column
-      licensePlate: columnValues[6] || columnData.licensePlate || '', // License plate if it exists
+      licenseState: columnValues[7] || columnData.licenseState || '', // License State
+      licensePlate: columnValues[8] || columnData.licensePlate || '', // License Num
       mondayItemId: foundItem.id,
     });
   } catch (error) {

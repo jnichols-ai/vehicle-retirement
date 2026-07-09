@@ -27,6 +27,7 @@ export default function VehicleRetirementForm() {
     make: '',
     model: '',
     year: '',
+    licenseState: '',
     licensePlate: '',
     mileage: '',
     gpsRemoved: false,
@@ -77,6 +78,7 @@ export default function VehicleRetirementForm() {
         make: vehicleData.make || '',
         model: vehicleData.model || '',
         year: vehicleData.year || '',
+        licenseState: vehicleData.licenseState || '',
         licensePlate: vehicleData.licensePlate || '',
       }));
       setVinLookupError('');
@@ -87,6 +89,7 @@ export default function VehicleRetirementForm() {
         make: '',
         model: '',
         year: '',
+        licenseState: '',
         licensePlate: '',
       }));
     } finally {
@@ -171,6 +174,7 @@ export default function VehicleRetirementForm() {
       formDataToSend.append('make', formData.make);
       formDataToSend.append('model', formData.model);
       formDataToSend.append('year', formData.year);
+      formDataToSend.append('licenseState', formData.licenseState);
       formDataToSend.append('licensePlate', formData.licensePlate);
       formDataToSend.append('mileage', formData.mileage);
       formDataToSend.append('gpsRemoved', formData.gpsRemoved);
@@ -200,6 +204,7 @@ export default function VehicleRetirementForm() {
         make: '',
         model: '',
         year: '',
+        licenseState: '',
         licensePlate: '',
         mileage: '',
         gpsRemoved: false,
@@ -329,15 +334,26 @@ export default function VehicleRetirementForm() {
                 />
               </div>
               <div className="vrp-form-group">
-                <label htmlFor="licensePlate">License Plate</label>
+                <label htmlFor="licenseState">License State</label>
                 <input
-                  id="licensePlate"
+                  id="licenseState"
                   type="text"
-                  value={formData.licensePlate}
+                  value={formData.licenseState}
                   readOnly
                   className="vrp-input vrp-input-readonly"
                 />
               </div>
+            </div>
+
+            <div className="vrp-form-group">
+              <label htmlFor="licensePlate">License Plate</label>
+              <input
+                id="licensePlate"
+                type="text"
+                value={formData.licensePlate}
+                readOnly
+                className="vrp-input vrp-input-readonly"
+              />
             </div>
 
             <div className="vrp-form-group">
