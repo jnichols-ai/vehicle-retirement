@@ -9,66 +9,84 @@ export default async function handler(req, res) {
 
   const { vin } = req.body;
 
-  if (!vin || vin.length !== 17) {
-    return res.status(400).json({ error: 'VIN must be exactly 17 characters' });
+  if (!vin) {
+    return res.status(400).json({ error: 'VIN is required' });
   }
 
   try {
-    // Query FL TRUCKS ENTERPRISE board (id: 18391343450)
-    const vehicles = await mondayApi.searchBoardItems({
-      boardId: 18391343450,
-      searchTerm: vin.toUpperCase(),
+    const vinUpper = vin.toUpperCase().trim();
+
+    // Query FL TRUCKS ENTERPRISE board directly (id: 18391343450)
+    // Get all items and search through them
+    const query = `
+      query {
+        boards(ids: [18391343450]) {
+          items_page(limit: 500) {
+            items {
+              id
+              name
+              column_values {
+                id
+                text
+                type
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MONDAY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
     });
 
-    if (!vehicles || vehicles.length === 0) {
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error('Monday API error:', data.errors);
+      return res.status(500).json({ error: 'API error: ' + data.errors[0].message });
+    }
+
+    const items = data.data.boards[0].items_page.items;
+
+    // Search through items to find VIN
+    const foundItem = items.find(item => {
+      return item.column_values.some(cv =>
+        cv.text && cv.text.toUpperCase().includes(vinUpper)
+      );
+    });
+
+    if (!foundItem) {
       return res.status(404).json({ error: 'Vehicle not found in system' });
     }
 
-    const vehicle = vehicles[0];
-    const vehicleData = await mondayApi.getItemDetails(vehicle.id, 18391343450);
-
-    // Extract column values - they contain text representation of the data
-    // Column structure: Vehicle unit, Year, VIN, Make, Model, Series, etc.
-    const columnTexts = vehicleData.column_values.map(cv => cv.text).filter(Boolean);
-
-    // Parse the values - based on the board structure
-    // The column_values array should have: vehicle_unit, year, vin, make, model, series, license_plate
-    let extractedData = {
-      vin: vin.toUpperCase(),
-      make: '',
-      model: '',
-      year: '',
-      licensePlate: '',
-    };
-
-    // Try to find data by matching position in column_values
-    // Column order: Vehicle unit (idx 0), Year (idx 1), VIN (idx 2), Make (idx 3), Model (idx 4), Series (idx 5), etc.
-    vehicleData.column_values.forEach((cv, idx) => {
-      const text = cv.text || '';
-      if (text) {
-        // Match by column position or content
-        if (cv.id && cv.id.includes('year')) extractedData.year = text;
-        if (cv.id && cv.id.includes('make')) extractedData.make = text;
-        if (cv.id && cv.id.includes('model')) extractedData.model = text;
-        if (cv.id && cv.id.includes('vin')) extractedData.vin = text.toUpperCase();
+    // Extract vehicle data from columns
+    const columnData = {};
+    foundItem.column_values.forEach(cv => {
+      if (cv.text) {
+        columnData[cv.id] = cv.text;
       }
     });
 
-    // If we didn't find values by ID, use position-based extraction
-    if (!extractedData.year && columnTexts[1]) extractedData.year = columnTexts[1];
-    if (!extractedData.make && columnTexts[3]) extractedData.make = columnTexts[3];
-    if (!extractedData.model && columnTexts[4]) extractedData.model = columnTexts[4];
+    // Based on the board structure, map columns
+    // The columns appear to be in this order: Vehicle unit, Year, VIN, Make, Model, Series
+    const columnValues = foundItem.column_values.map(cv => cv.text).filter(Boolean);
 
     return res.status(200).json({
-      vin: extractedData.vin || vin.toUpperCase(),
-      make: extractedData.make,
-      model: extractedData.model,
-      year: extractedData.year,
-      licensePlate: extractedData.licensePlate,
-      mondayItemId: vehicle.id,
+      vin: vinUpper,
+      make: columnValues[3] || columnData.make || '', // Make is typically 4th column
+      model: columnValues[4] || columnData.model || '', // Model is typically 5th column
+      year: columnValues[1] || columnData.year || '', // Year is typically 2nd column
+      licensePlate: columnValues[6] || columnData.licensePlate || '', // License plate if it exists
+      mondayItemId: foundItem.id,
     });
   } catch (error) {
     console.error('VIN lookup error:', error);
-    return res.status(500).json({ error: 'Failed to lookup vehicle' });
+    return res.status(500).json({ error: 'Failed to lookup vehicle: ' + error.message });
   }
 }
