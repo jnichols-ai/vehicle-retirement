@@ -79,11 +79,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       vin: vinUpper,
-      make: columnValues[3] || columnData.make || '', // Make is typically 4th column
-      model: columnValues[4] || columnData.model || '', // Model is typically 5th column
-      year: columnValues[1] || columnData.year || '', // Year is typically 2nd column
-      licenseState: columnValues[7] || columnData.licenseState || '', // License State
-      licensePlate: columnValues[8] || columnData.licensePlate || '', // License Num
+      make: columnValues[3] || columnData.make || '', // Make (index 4 in full list, 3 in column_values)
+      model: columnValues[4] || columnData.model || '', // Model (index 5 in full list, 4 in column_values)
+      year: columnValues[1] || columnData.year || '', // Year (index 2 in full list, 1 in column_values)
+      licenseState: columnValues[6] || columnData.licenseState || '', // License State (index 7 in full list, 6 in column_values)
+      licensePlate: columnValues[7] || columnData.licensePlate || '', // License Num (index 8 in full list, 7 in column_values)
       mondayItemId: foundItem.id,
     });
   } catch (error) {
